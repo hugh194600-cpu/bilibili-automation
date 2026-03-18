@@ -1,0 +1,480 @@
+/* pages/hangup/hangup.wxss */
+
+.container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding: 20rpx;
+  padding-bottom: 40rpx;
+}
+
+/* 未登录状态 */
+.not-login {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+}
+
+.not-login-card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 60rpx 40rpx;
+  text-align: center;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.08);
+  width: 80%;
+}
+
+.not-login-icon {
+  font-size: 80rpx;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.not-login-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.not-login-desc {
+  display: block;
+  font-size: 26rpx;
+  color: #999;
+  margin-bottom: 40rpx;
+}
+
+/* 状态卡片 */
+.status-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 40rpx;
+  text-align: center;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  transition: all 0.3s;
+}
+
+.status-card.status-active {
+  background: linear-gradient(135deg, #52c41a 0%, #389e0d 100%);
+}
+
+.status-card.status-active .status-text,
+.status-card.status-active .duration-label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.status-card.status-active .duration-value {
+  color: #fff;
+}
+
+.status-header {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+}
+
+.status-icon-area {
+  margin-bottom: 20rpx;
+}
+
+.btn-refresh {
+  position: absolute;
+  right: 0;
+  top: -10rpx;
+  background: #f0f0f0;
+  border: none;
+  padding: 10rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+.status-icon-large {
+  font-size: 80rpx;
+}
+
+.status-icon-large.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.status-text {
+  font-size: 28rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 24rpx;
+}
+
+.duration-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.duration-label {
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 8rpx;
+}
+
+.duration-value {
+  font-size: 48rpx;
+  font-weight: 700;
+  color: #333;
+}
+
+/* 卡片通用样式 */
+.card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.card-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: center;
+}
+
+.card-title .icon {
+  margin-right: 12rpx;
+}
+
+.log-count {
+  font-weight: 400;
+  color: #999;
+  font-size: 24rpx;
+  margin-left: 8rpx;
+}
+
+/* 输入框 */
+.input-group {
+  margin-bottom: 20rpx;
+}
+
+.input-label {
+  font-size: 26rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.input {
+  width: 100%;
+  height: 88rpx;
+  background: #f8f8f8;
+  border-radius: 12rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+  border: 2rpx solid transparent;
+}
+
+.input:focus {
+  border-color: #00A0E9;
+  background: #fff;
+}
+
+/* 提示 */
+.tips {
+  display: flex;
+  align-items: flex-start;
+  padding: 16rpx 20rpx;
+  background: #fffbe6;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  color: #fa8c16;
+  margin-bottom: 20rpx;
+}
+
+.tips-icon {
+  margin-right: 8rpx;
+}
+
+/* 推荐直播间 */
+.recommend-rooms {
+  border-top: 1rpx solid #f0f0f0;
+  padding-top: 20rpx;
+}
+
+.recommend-title {
+  font-size: 24rpx;
+  color: #999;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.room-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.room-item {
+  padding: 12rpx 24rpx;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.room-item.active {
+  background: #e6f7ff;
+  color: #00A0E9;
+}
+
+/* 信息行 */
+.info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.info-value {
+  font-size: 26rpx;
+  color: #333;
+  font-weight: 500;
+}
+
+.text-success {
+  color: #52c41a !important;
+}
+
+.text-warning {
+  color: #fa8c16 !important;
+}
+
+/* 宠物卡片 */
+.pet-card {
+  background: linear-gradient(135deg, #fff7e6 0%, #fff 100%);
+  border: 1rpx solid #ffd591;
+}
+
+.pet-level {
+  margin-left: 16rpx;
+  font-size: 24rpx;
+  color: #fa8c16;
+  font-weight: 500;
+}
+
+.pet-info {
+  margin-top: 16rpx;
+}
+
+.pet-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12rpx;
+}
+
+.pet-exp {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 12rpx;
+}
+
+.pet-progress {
+  width: 100%;
+}
+
+/* 警告卡片 */
+.warning-card {
+  background: #fffbe6;
+  border: 1rpx solid #ffe58f;
+}
+
+.warning-content {
+  display: flex;
+  align-items: center;
+}
+
+.warning-icon {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+}
+
+.warning-text {
+  font-size: 24rpx;
+  color: #fa8c16;
+}
+
+/* 宠物加载状态 */
+.pet-loading {
+  font-size: 24rpx;
+  color: #999;
+  font-weight: 400;
+  margin-left: 16rpx;
+}
+
+.pet-empty {
+  padding: 20rpx;
+  text-align: center;
+  color: #999;
+  font-size: 24rpx;
+}
+
+/* 直播间卡片 */
+.room-card {
+  background: linear-gradient(135deg, #e6f7ff 0%, #fff 100%);
+  border: 1rpx solid #91d5ff;
+}
+
+.room-info {
+  margin-top: 12rpx;
+}
+
+.room-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.room-anchor {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 4rpx;
+}
+
+.room-id {
+  font-size: 24rpx;
+  color: #999;
+}
+
+/* 按钮区域 */
+.btn-area {
+  margin: 30rpx 0;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 96rpx;
+  border-radius: 48rpx;
+  font-size: 32rpx;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #00A0E9 0%, #0080DC 100%);
+  color: #fff;
+  box-shadow: 0 8rpx 24rpx rgba(0, 160, 233, 0.4);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%);
+  color: #fff;
+  box-shadow: 0 8rpx 24rpx rgba(255, 77, 79, 0.4);
+}
+
+.btn:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+.btn[disabled] {
+  background: #ccc;
+  box-shadow: none;
+}
+
+.btn-icon {
+  font-size: 36rpx;
+  margin-right: 12rpx;
+}
+
+/* 日志卡片 */
+.log-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx 30rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.log-view {
+  max-height: 300rpx;
+  background: #f8f8f8;
+  border-radius: 8rpx;
+  padding: 16rpx;
+}
+
+.log-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 8rpx 0;
+  font-size: 24rpx;
+}
+
+.log-time {
+  color: #999;
+  margin-right: 16rpx;
+  white-space: nowrap;
+}
+
+.log-content {
+  color: #666;
+  flex: 1;
+}
+
+.log-empty {
+  text-align: center;
+  padding: 40rpx;
+  color: #999;
+  font-size: 24rpx;
+}
+
+/* 说明卡片 */
+.explain-card {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 24rpx 30rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.explain-content {
+  font-size: 24rpx;
+  color: #999;
+  line-height: 1.8;
+}
+
+/* 按钮样式 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 88rpx;
+  padding: 0 60rpx;
+  border-radius: 44rpx;
+  font-size: 30rpx;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #00A0E9 0%, #0080DC 100%);
+  color: #fff;
+}

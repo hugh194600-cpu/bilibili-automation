@@ -1,0 +1,116 @@
+<!--pages/mine/mine.wxml-->
+<view class="container">
+  <!-- 用户信息区域 -->
+  <view class="user-area">
+    <view class="user-bg"></view>
+    <view class="user-card">
+      <image
+        class="user-avatar"
+        src="{{userInfo.face || 'https://i0.hdslb.com/bfs/archive/3c8dd27f9c4a4d7437c8d1c5e99c81c8.png@96w_96h_1c.png'}}"
+        mode="aspectFill"
+      ></image>
+      <view class="user-info" wx:if="{{isLogin}}">
+        <text class="user-name">{{userInfo.uname}}</text>
+        <view class="user-meta">
+          <text class="user-level">L{{userInfo.level}}</text>
+          <text class="user-uid">UID: {{userInfo.uid}}</text>
+        </view>
+      </view>
+      <view class="user-info" wx:else>
+        <text class="user-name login-tip">未登录</text>
+        <text class="login-desc">登录后享受更多功能</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-area">
+    <!-- 登录/退出按钮 -->
+    <view class="menu-item" bindtap="{{isLogin ? 'handleLogout' : 'goToLogin'}}">
+      <view class="menu-left">
+        <text class="menu-icon">{{isLogin ? '🚪' : '🔑'}}</text>
+        <text class="menu-text">{{isLogin ? '退出登录' : '登录账号'}}</text>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+
+    <!-- 分割线 -->
+    <view class="menu-divider"></view>
+
+    <!-- 设置项 -->
+    <view class="menu-item" bindtap="showHelp">
+      <view class="menu-left">
+        <text class="menu-icon">❓</text>
+        <text class="menu-text">使用帮助</text>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+
+    <view class="menu-item" bindtap="showAbout">
+      <view class="menu-left">
+        <text class="menu-icon">ℹ️</text>
+        <text class="menu-text">关于我们</text>
+      </view>
+      <text class="menu-arrow">›</text>
+    </view>
+
+    <view class="menu-item" bindtap="clearCache">
+      <view class="menu-left">
+        <text class="menu-icon">🗑️</text>
+        <text class="menu-text">清除缓存</text>
+      </view>
+      <view class="menu-right">
+        <text class="cache-size">{{cacheSize}}</text>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 数据统计 -->
+  <view class="stats-area" wx:if="{{isLogin}}">
+    <view class="card-title">📊 数据统计</view>
+    <view class="stats-grid">
+      <view class="stats-item">
+        <text class="stats-value">{{stats.totalSignDays || 0}}</text>
+        <text class="stats-label">累计签到</text>
+      </view>
+      <view class="stats-item">
+        <text class="stats-value">{{stats.todayHangup || 0}}</text>
+        <text class="stats-label">今日挂机(秒)</text>
+      </view>
+      <view class="stats-item">
+        <text class="stats-value">{{stats.totalHangup || 0}}</text>
+        <text class="stats-label">累计挂机(时)</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 使用说明 -->
+  <view class="guide-area">
+    <view class="card-title">📖 使用说明</view>
+    <view class="guide-content">
+      <view class="guide-item">
+        <text class="guide-num">1</text>
+        <text class="guide-text">登录B站账号（需要Cookie）</text>
+      </view>
+      <view class="guide-item">
+        <text class="guide-num">2</text>
+        <text class="guide-text">在签到页面完成每日签到</text>
+      </view>
+      <view class="guide-item">
+        <text class="guide-num">3</text>
+        <text class="guide-text">进入挂机页面开始修炼</text>
+      </view>
+      <view class="guide-item">
+        <text class="guide-num">4</text>
+        <text class="guide-text">输入直播间ID开始自动挂机</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 版本信息 -->
+  <view class="version-info">
+    <text>B站弹幕宠物助手 v1.0.0</text>
+    <text class="version-tip">仅供学习交流使用</text>
+  </view>
+</view>

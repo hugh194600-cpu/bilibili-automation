@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "openapi": [
+      "security.msgSecCheck",
+      "security.imgSecCheck"
+    ]
+  },
+  "env": "${CLOUD_ENV}",
+  "timeout": 10
+}

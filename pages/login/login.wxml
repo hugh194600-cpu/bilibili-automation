@@ -1,0 +1,87 @@
+<!--pages/login/login.wxml-->
+<view class="container">
+  <!-- Logo区域 -->
+  <view class="logo-area">
+    <view class="logo">
+      <image class="logo-icon" src="https://i0.hdslb.com/bfs/archive/3c8dd27f9c4a4d7437c8d1c5e99c81c8.png@96w_96h_1c.png" mode="aspectFit"></image>
+    </view>
+    <text class="app-name">B站弹幕宠物助手</text>
+    <text class="app-desc">自动化签到挂机 轻松养成</text>
+  </view>
+
+  <!-- 登录说明 -->
+  <view class="card">
+    <view class="card-title">
+      <text class="icon">📋</text>
+      如何获取Cookie
+    </view>
+    <view class="desc-text">
+      <text class="step-title">电脑端：</text>
+      <text>1. 打开B站网页 bilibili.com 并登录\n</text>
+      <text>2. 按 F12 打开开发者工具\n</text>
+      <text>3. 切换到 Network（网络）标签\n</text>
+      <text>4. 刷新页面，点击任意请求\n</text>
+      <text>5. 右侧 Headers → Request Headers → Cookie\n</text>
+      <text>6. 复制完整Cookie字符串</text>
+    </view>
+    <view class="desc-text mt-20">
+      <text class="step-title">手机端：</text>
+      <text>1. 用手机浏览器打开B站网页版\n</text>
+      <text>2. 登录后，点击右下角「我的」\n</text>
+      <text>3. 点击头像进入个人空间\n</text>
+      <text>4. 查看网页源代码获取Cookie\n</text>
+      <text>（推荐使用电脑端获取，更简单）</text>
+    </view>
+  </view>
+
+  <!-- Cookie输入 -->
+  <view class="card">
+    <view class="card-title">
+      <text class="icon">🍪</text>
+      B站Cookie
+    </view>
+    <view class="input-group">
+      <textarea
+        class="cookie-input"
+        placeholder="请粘贴完整的Cookie内容"
+        placeholder-class="placeholder"
+        value="{{cookie}}"
+        bindinput="onCookieInput"
+        maxlength="-1"
+        auto-height
+      ></textarea>
+    </view>
+    <view class="tips">
+      <text class="tips-icon">💡</text>
+      <text>Cookie是保障账号安全的重要凭证，请勿泄露给他人</text>
+    </view>
+  </view>
+
+  <!-- 用户协议 -->
+  <view class="agreement">
+    <checkbox-group bindchange="onAgreementChange">
+      <label class="checkbox-label">
+        <checkbox value="agreed" checked="{{agreed}}" color="#00A0E9"/>
+        <text class="agreement-text">我已阅读并同意</text>
+        <text class="link" bindtap="showAgreement">《使用协议》</text>
+      </label>
+    </checkbox-group>
+  </view>
+
+  <!-- 登录按钮 -->
+  <view class="btn-area">
+    <button
+      class="btn btn-primary btn-block"
+      bindtap="handleLogin"
+      disabled="{{!cookie || !agreed || loading}}"
+      loading="{{loading}}"
+    >
+      {{loading ? '登录中...' : '立即登录'}}
+    </button>
+  </view>
+
+  <!-- 测试账号提示 -->
+  <view class="test-tip" wx:if="{{false}}">
+    <text>测试阶段，暂不支持新用户注册</text>
+  </view>
+</view>

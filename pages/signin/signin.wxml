@@ -1,0 +1,100 @@
+<!--pages/signin/signin.wxml-->
+<view class="container">
+  <!-- 未登录提示 -->
+  <view class="not-login" wx:if="{{!isLogin}}">
+    <view class="not-login-card">
+      <text class="not-login-icon">🔒</text>
+      <text class="not-login-title">请先登录</text>
+      <text class="not-login-desc">登录后即可签到</text>
+      <button class="btn btn-primary" bindtap="goToLogin">去登录</button>
+    </view>
+  </view>
+
+  <!-- 签到主体 -->
+  <view class="signin-content" wx:else>
+    <!-- 签到日历 -->
+    <view class="calendar-card">
+      <view class="calendar-header">
+        <text class="month-text">{{currentMonth}}月</text>
+        <text class="year-text">{{currentYear}}年</text>
+      </view>
+      <view class="calendar-week">
+        <text class="week-item" wx:for="{{weekDays}}" wx:key="index">{{item}}</text>
+      </view>
+      <view class="calendar-days">
+        <view
+          class="day-item {{item.signed ? 'signed' : ''}} {{item.isToday ? 'today' : ''}}"
+          wx:for="{{calendarDays}}"
+          wx:key="index"
+        >
+          <text class="day-text">{{item.day}}</text>
+          <view class="sign-mark" wx:if="{{item.signed}}">✓</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 签到信息 -->
+    <view class="info-card">
+      <view class="info-row">
+        <text class="info-label">连续签到</text>
+        <text class="info-value">{{signInfo.days || 0}} 天</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">签到状态</text>
+        <text class="info-value {{signInfo.status === 2 ? 'text-success' : 'text-warning'}}">
+          {{signInfo.status === 2 ? '已签到' : '未签到'}}
+        </text>
+      </view>
+      <view class="info-row" wx:if="{{signInfo.special_text}}">
+        <text class="info-label">特别奖励</text>
+        <text class="info-value">{{signInfo.special_text}}</text>
+      </view>
+    </view>
+
+    <!-- 签到按钮 -->
+    <view class="signin-btn-area">
+      <button
+        class="btn-signin {{signInfo.status === 2 ? 'btn-disabled' : 'btn-active'}}"
+        bindtap="handleSign"
+        disabled="{{signInfo.status === 2 || signing}}"
+        loading="{{signing}}"
+      >
+        <text class="btn-icon">{{signInfo.status === 2 ? '✓' : '📝'}}</text>
+        <text class="btn-text">
+          {{signing ? '签到中...' : (signInfo.status === 2 ? '今日已签到' : '立即签到')}}
+        </text>
+      </button>
+    </view>
+
+    <!-- 签到奖励说明 -->
+    <view class="reward-card">
+      <view class="card-title">
+        <text class="icon">🎁</text>
+        签到奖励
+      </view>
+      <view class="reward-list">
+        <view class="reward-item" wx:for="{{rewardList}}" wx:key="index">
+          <text class="reward-day">第{{item.day}}天</text>
+          <text class="reward-value">{{item.value}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 签到记录 -->
+    <view class="log-card">
+      <view class="card-title">
+        <text class="icon">📋</text>
+        签到记录
+      </view>
+      <view class="log-list" wx:if="{{signLogs.length > 0}}">
+        <view class="log-item" wx:for="{{signLogs}}" wx:key="index">
+          <text class="log-date">{{item.date}}</text>
+          <text class="log-reward">{{item.reward}}</text>
+        </view>
+      </view>
+      <view class="empty-log" wx:else>
+        <text>暂无签到记录</text>
+      </view>
+    </view>
+  </view>
+</view>

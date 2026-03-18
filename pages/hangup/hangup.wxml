@@ -1,0 +1,214 @@
+<!--pages/hangup/hangup.wxml-->
+<view class="container">
+  <!-- 未登录提示 -->
+  <view class="not-login" wx:if="{{!isLogin}}">
+    <view class="not-login-card">
+      <text class="not-login-icon">🔒</text>
+      <text class="not-login-title">请先登录</text>
+      <text class="not-login-desc">登录后即可使用挂机功能</text>
+      <button class="btn btn-primary" bindtap="goToLogin">去登录</button>
+    </view>
+  </view>
+
+  <!-- 挂机主体 -->
+  <view class="hangup-content" wx:else>
+    <!-- 状态卡片 -->
+    <view class="status-card {{isHanging ? 'status-active' : ''}}">
+      <view class="status-header">
+        <view class="status-icon-area">
+          <text class="status-icon-large {{isHanging ? 'pulse' : ''}}">🎮</text>
+        </view>
+        <button
+          class="btn-refresh"
+          size="mini"
+          bindtap="refreshStatus"
+          loading="{{refreshing}}"
+        >
+          <text>🔄</text>
+        </button>
+      </view>
+      <text class="status-text">
+        {{isHanging ? '正在挂机修炼中...' : '点击下方按钮开始挂机'}}
+      </text>
+      <view class="duration-display" wx:if="{{isHanging}}">
+        <text class="duration-label">挂机时长</text>
+        <text class="duration-value">{{hangupDurationText}}</text>
+      </view>
+      <view class="duration-display" wx:else>
+        <text class="duration-label">今日累计</text>
+        <text class="duration-value">{{todayDurationText}}</text>
+      </view>
+    </view>
+
+    <!-- 弹幕宠物状态 -->
+    <view class="card pet-card">
+      <view class="card-title">
+        <text class="icon">🐱</text>
+        弹幕宠物
+        <text class="pet-level" wx:if="{{petInfo}}">Lv.{{petInfo.level || 0}}</text>
+        <text class="pet-loading" wx:if="{{petLoading}}">加载中...</text>
+      </view>
+      <view class="pet-info" wx:if="{{petInfo}}">
+        <view class="pet-name">{{petInfo.name || '未命名'}}</view>
+        <view class="pet-exp">
+          <text>经验: {{petInfo.exp || 0}} / {{petInfo.next_exp || 100}}</text>
+        </view>
+        <view class="pet-progress">
+          <progress
+            percent="{{(petInfo.exp / petInfo.next_exp) * 100 || 0}}"
+            activeColor="#00A0E9"
+            backgroundColor="#e0e0e0"
+            stroke-width="6"
+            border-radius="3"
+          />
+        </view>
+      </view>
+      <view class="pet-empty" wx:else>
+        <text wx:if="{{petLoading}}">正在加载宠物信息...</text>
+        <text wx:else>未检测到弹幕宠物，请先在B站直播间领取</text>
+      </view>
+    </view>
+
+    <!-- 直播间信息 -->
+    <view class="card room-card" wx:if="{{roomInfo || hangupRoomId}}">
+      <view class="card-title">
+        <text class="icon">📺</text>
+        直播间信息
+      </view>
+      <view class="room-info" wx:if="{{roomInfo}}">
+        <view class="room-title">{{roomInfo.title || '未知'}}</view>
+        <view class="room-anchor">主播: {{roomInfo.uname || '未知'}}</view>
+        <view class="room-id">房间号: {{roomInfo.room_id || hangupRoomId}}</view>
+      </view>
+      <view class="room-info" wx:elif="{{hangupRoomId}}">
+        <view class="room-id">房间号: {{hangupRoomId}}</view>
+      </view>
+    </view>
+
+    <!-- CSRF状态提示 -->
+    <view class="card warning-card" wx:if="{{!hasCsrf && isLogin}}">
+      <view class="warning-content">
+        <text class="warning-icon">⚠️</text>
+        <text class="warning-text">Cookie缺少bili_jct，弹幕将使用本地模拟模式</text>
+      </view>
+    </view>
+
+    <!-- 挂机设置 -->
+    <view class="card" wx:if="{{!isHanging}}">
+      <view class="card-title">
+        <text class="icon">⚙️</text>
+        挂机设置
+      </view>
+      <view class="input-group">
+        <text class="input-label">直播间ID</text>
+        <input
+          class="input"
+          type="number"
+          placeholder="请输入要挂机的直播间ID"
+          value="{{roomId}}"
+          bindinput="onRoomIdInput"
+        />
+      </view>
+      <view class="tips">
+        <text class="tips-icon">💡</text>
+        <text>可以输入任意直播间ID进行挂机，系统会自动发送弹幕获取经验</text>
+      </view>
+
+      <!-- 推荐直播间 -->
+      <view class="recommend-rooms">
+        <text class="recommend-title">推荐直播间</text>
+        <view class="room-list">
+          <view
+            class="room-item {{roomId == item.id ? 'active' : ''}}"
+            wx:for="{{recommendRooms}}"
+            wx:key="id"
+            data-id="{{item.id}}"
+            bindtap="selectRoom"
+          >
+            <text>{{item.name}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 挂机信息 -->
+    <view class="card" wx:if="{{isHanging}}">
+      <view class="card-title">
+        <text class="icon">📊</text>
+        挂机信息
+      </view>
+      <view class="info-row">
+        <text class="info-label">当前直播间</text>
+        <text class="info-value">{{hangupRoomId}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">开始时间</text>
+        <text class="info-value">{{hangupStartTimeText}}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">弹幕发送</text>
+        <text class="info-value">{{danmuCount}} 条</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">获得经验</text>
+        <text class="info-value text-success">+{{expGained}} 经验</text>
+      </view>
+      <!-- 挂机服务器详情 -->
+      <view class="info-row" wx:if="{{hangupDetail}}">
+        <text class="info-label">服务器挂机</text>
+        <text class="info-value {{hangupDetail.is_hangup ? 'text-success' : 'text-warning'}}">
+          {{hangupDetail.is_hangup ? '已开启' : '未开启'}}
+        </text>
+      </view>
+      <view class="info-row" wx:if="{{hangupDetail && hangupDetail.durations}}">
+        <text class="info-label">服务器时长</text>
+        <text class="info-value">{{hangupDetail.durations}} 分钟</text>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="btn-area">
+      <button
+        class="btn {{isHanging ? 'btn-danger' : 'btn-primary'}} btn-block"
+        bindtap="toggleHangup"
+        disabled="{{!isHanging && !roomId}}"
+        loading="{{loading}}"
+      >
+        <text class="btn-icon">{{isHanging ? '⏹️' : '▶️'}}</text>
+        <text class="btn-text">{{loading ? '处理中...' : (isHanging ? '停止挂机' : '开始挂机')}}</text>
+      </button>
+    </view>
+
+    <!-- 日志区域 -->
+    <view class="log-card">
+      <view class="card-title">
+        <text class="icon">📋</text>
+        实时日志
+        <text class="log-count">({{logList.length}})</text>
+      </view>
+      <scroll-view class="log-view" scroll-y enhanced show-scrollbar="{{false}}">
+        <view class="log-item" wx:for="{{logList}}" wx:key="index">
+          <text class="log-time">{{item.time}}</text>
+          <text class="log-content">{{item.content}}</text>
+        </view>
+        <view class="log-empty" wx:if="{{logList.length === 0}}">
+          <text>暂无日志</text>
+        </view>
+      </scroll-view>
+    </view>
+
+    <!-- 说明 -->
+    <view class="explain-card">
+      <view class="card-title">
+        <text class="icon">📖</text>
+        说明
+      </view>
+      <view class="explain-content">
+        <text>1. 挂机需要在直播间发送弹幕获取经验\n</text>
+        <text>2. 请确保B站Cookie有效，否则会导致挂机失败\n</text>
+        <text>3. 挂机过程中请保持小程序在后台运行\n</text>
+        <text>4. 如遇问题，请尝试重新登录获取新的Cookie</text>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,110 @@
+<!--pages/index/index.wxml-->
+<view class="container">
+  <!-- 未登录状态 -->
+  <view class="not-login" wx:if="{{!isLogin}}">
+    <view class="not-login-card">
+      <image class="not-login-icon" src="https://i0.hdslb.com/bfs/archive/3c8dd27f9c4a4d7437c8d1c5e99c81c8.png@96w_96h_1c.png" mode="aspectFit"></image>
+      <text class="not-login-title">请先登录</text>
+      <text class="not-login-desc">登录B站账号以使用全部功能</text>
+      <button class="btn btn-primary" bindtap="goToLogin">立即登录</button>
+    </view>
+  </view>
+
+  <!-- 已登录状态 -->
+  <view class="logged-in" wx:else>
+    <!-- 用户信息卡片 -->
+    <view class="user-card">
+      <view class="user-info">
+        <image class="user-avatar" src="{{userInfo.face || 'https://i0.hdslb.com/bfs/archive/3c8dd27f9c4a4d7437c8d1c5e99c81c8.png@96w_96h_1c.png'}}" mode="aspectFill"></image>
+        <view class="user-detail">
+          <text class="user-name">{{userInfo.uname}}</text>
+          <view class="user-meta">
+            <text class="user-level">L{{userInfo.level}}</text>
+            <text class="user-uid">UID: {{userInfo.uid}}</text>
+          </view>
+        </view>
+      </view>
+      <button class="btn-logout" bindtap="handleLogout">退出</button>
+    </view>
+
+    <!-- 状态概览 -->
+    <view class="status-grid">
+      <!-- 签到状态 -->
+      <view class="status-card" bindtap="goToSignin">
+        <view class="status-icon sign-icon">📅</view>
+        <text class="status-title">签到</text>
+        <text class="status-value {{signStatus.signed ? 'text-success' : 'text-warning'}}">
+          {{signStatus.signed ? '已签到' : '未签到'}}
+        </text>
+        <text class="status-days" wx:if="{{signStatus.signDays > 0}}">连续{{signStatus.signDays}}天</text>
+      </view>
+
+      <!-- 挂机状态 -->
+      <view class="status-card" bindtap="goToHangup">
+        <view class="status-icon hangup-icon {{isHanging ? 'pulse' : ''}}">🎮</view>
+        <text class="status-title">挂机</text>
+        <text class="status-value {{isHanging ? 'text-success' : 'text-gray'}}">
+          {{isHanging ? '进行中' : '未开始'}}
+        </text>
+        <text class="status-days" wx:if="{{hangupDuration > 0}}">{{hangupDurationText}}</text>
+      </view>
+
+      <!-- 在线状态 -->
+      <view class="status-card">
+        <view class="status-icon online-icon {{isOnline ? 'online' : ''}}">🟢</view>
+        <text class="status-title">在线</text>
+        <text class="status-value {{isOnline ? 'text-success' : 'text-gray'}}">
+          {{isOnline ? '在线' : '离线'}}
+        </text>
+        <text class="status-days" wx:if="{{onlineDuration > 0}}">{{onlineDurationText}}</text>
+      </view>
+
+      <!-- 宠物信息 -->
+      <view class="status-card" wx:if="{{petInfo}}">
+        <view class="status-icon pet-icon">🐱</view>
+        <text class="status-title">宠物</text>
+        <text class="status-value">{{petInfo.name || '弹幕宠物'}}</text>
+        <text class="status-days">Lv.{{petInfo.level || 1}}</text>
+      </view>
+    </view>
+
+    <!-- 快捷操作 -->
+    <view class="card quick-actions">
+      <view class="card-title">
+        <text class="icon">⚡</text>
+        快捷操作
+      </view>
+      <view class="action-list">
+        <view class="action-item" bindtap="handleQuickSign">
+          <text class="action-icon">📝</text>
+          <text class="action-text">立即签到</text>
+          <text class="action-arrow">›</text>
+        </view>
+        <view class="action-item" bindtap="goToHangup">
+          <text class="action-icon">🎯</text>
+          <text class="action-text">开始挂机</text>
+          <text class="action-arrow">›</text>
+        </view>
+        <view class="action-item" bindtap="refreshStatus">
+          <text class="action-icon">🔄</text>
+          <text class="action-text">刷新状态</text>
+          <text class="action-arrow">›</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 任务日志 -->
+    <view class="card task-log" wx:if="{{taskLogs.length > 0}}">
+      <view class="card-title">
+        <text class="icon">📋</text>
+        最近任务
+      </view>
+      <view class="log-list">
+        <view class="log-item" wx:for="{{taskLogs}}" wx:key="index">
+          <text class="log-time">{{item.time}}</text>
+          <text class="log-content">{{item.content}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
