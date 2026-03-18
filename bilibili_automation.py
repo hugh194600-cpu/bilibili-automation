@@ -297,25 +297,25 @@ class BilibiliAutomation:
         弹幕宠物挂机（通过在直播间发弹幕获得经验）
         
         B站弹幕宠物需要在直播间发送弹幕才能获得经验
-        API: https://api.bilibili.com/xlive/web-msg/send
+        API: https://api.live.bilibili.com/msg/send
         """
         self._log("执行弹幕宠物挂机（发送弹幕）...")
         
-        # 使用热门直播间列表中的一个
-        live_room_id = 6  # B站官方直播间，经常在线
+        # 使用热门直播间（官方直播间，经常在线）
+        live_room_id = 6
         
-        # 发送弹幕的内容
+        # 发送弹幕的内容（简单内容，容易被识别）
         danmaku_messages = [
-            "你好呀",
-            "哈哈",
-            "来了来了",
+            "你好",
+            "来了",
             "加油",
-            "666",
+            "哈哈",
             "真棒",
             "喜欢",
             "支持",
-            "棒棒的",
-            "太有意思了"
+            "111",
+            "222",
+            "666"
         ]
         
         # 尝试发送弹幕
@@ -328,23 +328,32 @@ class BilibiliAutomation:
             if not csrf:
                 self._log("  → 缺少bili_jct，无法发送弹幕", "WARNING")
             else:
-                # 发送弹幕API
-                url = f"{self.API_BASE}/xlive/web-msg/send"
-                data = {
-                    "type": 1,
-                    "oid": live_room_id,
-                    "msg": random.choice(danmaku_messages),
-                    "aid": live_room_id,
+                # 正确的弹幕发送API
+                url = "https://api.live.bilibili.com/msg/send"
+                
+                # 构建请求参数
+                msg = random.choice(danmaku_messages)
+                post_data = {
+                    "msg": msg,
+                    "roomid": live_room_id,
                     "csrf": csrf
                 }
                 
-                result = self._api_request(url, method="POST", data=data)
+                # 设置请求头
+                headers = self._make_headers()
+                headers["Content-Type"] = "application/x-www-form-urlencoded"
+                
+                # 发送请求
+                response = self._session.post(url, headers=headers, data=post_data, timeout=10)
+                result = response.json()
+                
+                self._log(f"  → 弹幕API响应: {result}", "DEBUG")
                 
                 if result and result.get("code") == 0:
-                    self._log(f"  → 弹幕发送成功: 在直播间{live_room_id}发送弹幕 ✓", "SUCCESS")
+                    self._log(f"  → 弹幕发送成功: '{msg}' 在直播间{live_room_id} ✓", "SUCCESS")
                     success = True
                 else:
-                    self._log(f"  → 弹幕发送失败: {result.get('message', '未知错误')}", "WARNING")
+                    self._log(f"  → 弹幕发送失败: {result.get('message', '未知错误')} (code={result.get('code')})", "WARNING")
         except Exception as e:
             self._log(f"  → API请求异常: {e}", "WARNING")
         
