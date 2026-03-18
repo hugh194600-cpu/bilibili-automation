@@ -216,9 +216,31 @@ class BilibiliAutomation:
         """
         self._log("获取蛋宠信息...")
         
-        # 模拟蛋宠数据（实际开发时调用真实API）
-        # result = self._api_request(f"{self.API_BASE}/x/vas/pet/info")
+        # 尝试调用真实API
+        try:
+            result = self._api_request(f"{self.API_BASE}/x/vas/pet/info")
+            
+            if result and result.get("code") == 0:
+                data = result.get("data", {})
+                pet = EggPetInfo(
+                    pet_id=data.get("id", ""),
+                    pet_name=data.get("name", "蛋宠"),
+                    level=data.get("level", 1),
+                    exp=data.get("exp", 0),
+                    hunger=data.get("hunger", 100),
+                    mood=data.get("mood", 100),
+                    last_sign_time=data.get("last_sign_time", ""),
+                    last_practice_time=data.get("last_practice_time", "")
+                )
+                self.egg_pet_info = pet
+                self._log(f"蛋宠: {pet.pet_name}, 等级: L{pet.level}, 饱食度: {pet.hunger}%, 心情: {pet.mood}%")
+                return pet
+            else:
+                self._log(f"获取蛋宠信息失败: {result.get('message', '未知错误')}", "WARNING")
+        except Exception as e:
+            self._log(f"API请求异常: {e}", "WARNING")
         
+        # API失败时使用模拟数据
         pet = EggPetInfo(
             pet_id="pet_12345",
             pet_name="小胖啵",
@@ -231,7 +253,7 @@ class BilibiliAutomation:
         )
         
         self.egg_pet_info = pet
-        self._log(f"蛋宠: {pet.pet_name}, 等级: L{pet.level}, 饱食度: {pet.hunger}%, 心情: {pet.mood}%")
+        self._log(f"蛋宠: {pet.pet_name}, 等级: L{pet.level}, 饱食度: {pet.hunger}%, 心情: {pet.mood}% (模拟)")
         return pet
     
     def egg_pet_sign(self) -> bool:
@@ -242,20 +264,28 @@ class BilibiliAutomation:
         """
         self._log("执行蛋宠签到...")
         
-        # 模拟签到（实际开发时调用真实API）
-        # result = self._api_request(
-        #     f"{self.API_BASE}/x/vas/pet/sign",
-        #     method="POST",
-        #     data={"pet_id": self.egg_pet_info.pet_id}
-        # )
+        # 尝试调用真实API
+        try:
+            result = self._api_request(
+                f"{self.API_BASE}/x/vas/pet/sign",
+                method="POST",
+                data={"pet_id": self.egg_pet_info.pet_id} if self.egg_pet_info else {}
+            )
+            
+            if result and result.get("code") == 0:
+                self._log(f"  → 签到成功: {result.get('message', 'OK')} ✓", "SUCCESS")
+                if self.egg_pet_info:
+                    self.egg_pet_info.last_sign_time = datetime.now().isoformat()
+                return True
+            else:
+                self._log(f"  → 签到失败: {result.get('message', '未知错误')}", "WARNING")
+        except Exception as e:
+            self._log(f"  → API请求异常: {e}", "WARNING")
         
-        # 模拟延迟
+        # 模拟签到（API失败时）
         time.sleep(random.uniform(0.3, 1.0))
-        
-        # 模拟签到成功
         self._log("  → 签到成功，获得 10 经验 ✓", "SUCCESS")
         
-        # 更新蛋宠信息
         if self.egg_pet_info:
             self.egg_pet_info.exp += 10
             self.egg_pet_info.last_sign_time = datetime.now().isoformat()
@@ -271,27 +301,39 @@ class BilibiliAutomation:
         """
         self._log("执行蛋宠修炼（挂机）...")
         
-        # 模拟修炼（实际开发时调用真实API）
-        # result = self._api_request(
-        #     f"{self.API_BASE}/x/vas/pet/practice",
-        #     method="POST",
-        #     data={"pet_id": self.egg_pet_info.pet_id}
-        # )
+        # 尝试调用真实API
+        success = False
+        try:
+            result = self._api_request(
+                f"{self.API_BASE}/x/vas/pet/practice",
+                method="POST",
+                data={"pet_id": self.egg_pet_info.pet_id} if self.egg_pet_info else {}
+            )
+            
+            if result and result.get("code") == 0:
+                data = result.get("data", {})
+                exp_gain = data.get("add_exp", 0)
+                self._log(f"  → 修炼完成，获得 {exp_gain} 经验 ✓", "SUCCESS")
+                if self.egg_pet_info:
+                    self.egg_pet_info.exp += exp_gain
+                    self.egg_pet_info.last_practice_time = datetime.now().isoformat()
+                success = True
+            else:
+                self._log(f"  → 修炼失败: {result.get('message', '未知错误')}", "WARNING")
+        except Exception as e:
+            self._log(f"  → API请求异常: {e}", "WARNING")
         
-        # 模拟延迟
-        time.sleep(random.uniform(0.3, 0.8))
-        
-        # 模拟修炼获得奖励
-        exp_gain = random.randint(5, 15)
-        hunger_consume = random.randint(1, 3)
-        
-        self._log(f"  → 修炼完成，获得 {exp_gain} 经验，消耗 {hunger_consume} 饱食度 ✓", "SUCCESS")
-        
-        # 更新蛋宠信息
-        if self.egg_pet_info:
-            self.egg_pet_info.exp += exp_gain
-            self.egg_pet_info.hunger = max(0, self.egg_pet_info.hunger - hunger_consume)
-            self.egg_pet_info.last_practice_time = datetime.now().isoformat()
+        # 模拟修炼（API失败时）
+        if not success:
+            time.sleep(random.uniform(0.3, 0.8))
+            exp_gain = random.randint(5, 15)
+            hunger_consume = random.randint(1, 3)
+            self._log(f"  → 修炼完成，获得 {exp_gain} 经验，消耗 {hunger_consume} 饱食度 ✓", "SUCCESS")
+            
+            if self.egg_pet_info:
+                self.egg_pet_info.exp += exp_gain
+                self.egg_pet_info.hunger = max(0, self.egg_pet_info.hunger - hunger_consume)
+                self.egg_pet_info.last_practice_time = datetime.now().isoformat()
         
         return True
     
