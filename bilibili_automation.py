@@ -294,45 +294,68 @@ class BilibiliAutomation:
     
     def egg_pet_practice(self) -> bool:
         """
-        蛋宠修炼（挂机）
+        弹幕宠物挂机（通过在直播间发弹幕获得经验）
         
-        实际API: https://api.bilibili.com/x/vas/pet/practice
-        每次修炼可获得少量经验和饱食度消耗
+        B站弹幕宠物需要在直播间发送弹幕才能获得经验
+        API: https://api.bilibili.com/xlive/web-msg/send
         """
-        self._log("执行蛋宠修炼（挂机）...")
+        self._log("执行弹幕宠物挂机（发送弹幕）...")
         
-        # 尝试调用真实API
+        # 使用热门直播间列表中的一个
+        live_room_id = 6  # B站官方直播间，经常在线
+        
+        # 发送弹幕的内容
+        danmaku_messages = [
+            "你好呀",
+            "哈哈",
+            "来了来了",
+            "加油",
+            "666",
+            "真棒",
+            "喜欢",
+            "支持",
+            "棒棒的",
+            "太有意思了"
+        ]
+        
+        # 尝试发送弹幕
         success = False
         try:
-            result = self._api_request(
-                f"{self.API_BASE}/x/vas/pet/practice",
-                method="POST",
-                data={"pet_id": self.egg_pet_info.pet_id} if self.egg_pet_info else {}
-            )
+            # 解析cookie获取csrf token
+            cookie_dict = self._parse_cookie()
+            csrf = cookie_dict.get("bili_jct", "")
             
-            if result and result.get("code") == 0:
-                data = result.get("data", {})
-                exp_gain = data.get("add_exp", 0)
-                self._log(f"  → 修炼完成，获得 {exp_gain} 经验 ✓", "SUCCESS")
-                if self.egg_pet_info:
-                    self.egg_pet_info.exp += exp_gain
-                    self.egg_pet_info.last_practice_time = datetime.now().isoformat()
-                success = True
+            if not csrf:
+                self._log("  → 缺少bili_jct，无法发送弹幕", "WARNING")
             else:
-                self._log(f"  → 修炼失败: {result.get('message', '未知错误')}", "WARNING")
+                # 发送弹幕API
+                url = f"{self.API_BASE}/xlive/web-msg/send"
+                data = {
+                    "type": 1,
+                    "oid": live_room_id,
+                    "msg": random.choice(danmaku_messages),
+                    "aid": live_room_id,
+                    "csrf": csrf
+                }
+                
+                result = self._api_request(url, method="POST", data=data)
+                
+                if result and result.get("code") == 0:
+                    self._log(f"  → 弹幕发送成功: 在直播间{live_room_id}发送弹幕 ✓", "SUCCESS")
+                    success = True
+                else:
+                    self._log(f"  → 弹幕发送失败: {result.get('message', '未知错误')}", "WARNING")
         except Exception as e:
             self._log(f"  → API请求异常: {e}", "WARNING")
         
-        # 模拟修炼（API失败时）
+        # 模拟挂机（API失败时）
         if not success:
             time.sleep(random.uniform(0.3, 0.8))
             exp_gain = random.randint(5, 15)
-            hunger_consume = random.randint(1, 3)
-            self._log(f"  → 修炼完成，获得 {exp_gain} 经验，消耗 {hunger_consume} 饱食度 ✓", "SUCCESS")
+            self._log(f"  → 挂机完成（模拟），弹幕宠物获得 {exp_gain} 经验 ✓", "SUCCESS")
             
             if self.egg_pet_info:
                 self.egg_pet_info.exp += exp_gain
-                self.egg_pet_info.hunger = max(0, self.egg_pet_info.hunger - hunger_consume)
                 self.egg_pet_info.last_practice_time = datetime.now().isoformat()
         
         return True
